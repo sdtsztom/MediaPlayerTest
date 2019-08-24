@@ -2,9 +2,9 @@ package com.test.acer.amediaplayer;
 
 /**
  * Created by acer on 2017/3/20.
- * release on 2017/4/27
- * vision:0.6
- * time:4
+ * release on 2019/08/25
+ * vision:0.6.1
+ * time:5
  */
 
 import android.Manifest;
@@ -226,11 +226,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //调用文件选择器选择音乐路径
     public void chooseMusic(){
-        Intent intent=new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("audio/*");
+        Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("audio/*");
         try{
-            startActivityForResult(Intent.createChooser(intent,"请选择一个音乐文件"),1);
+            startActivityForResult(intent,1);
         }catch(android.content.ActivityNotFoundException e){
             Toast.makeText(this,"请安装文件管理器",Toast.LENGTH_SHORT).show();
         }
@@ -243,16 +243,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case 1:
                 if(resultCode== Activity.RESULT_OK){
                     Uri uri=data.getData();
-                    Cursor cursor=this.getContentResolver().query(uri,null,null,null,null);
-                    if(cursor.moveToFirst()) {
-                        path = cursor.getString(cursor.getColumnIndex("_data"));
-                    }
+//                    Cursor cursor=this.getContentResolver().query(uri,null,null,null,null);
+//                    if(cursor.moveToFirst()) {
+//                        path = cursor.getString(cursor.getColumnIndex("_data"));
+//                    }
+                    path=getPathFromUri(uri);
                     if(path!=null){
                         musicService.path=path;
                         musicService.setDatabase();
 
                         //获取设置歌曲信息
-                        cursor=this.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null,MediaStore.Audio.Media.DATA+"=?",new String[]{path},null);
+                        Cursor cursor=this.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null,MediaStore.Audio.Media.DATA+"=?",new String[]{path},null);
                         if(cursor.moveToFirst()){
                             titleSaved=cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
                             artistSaved=cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
@@ -275,6 +276,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
         }
 
+    }
+
+    String getPathFromUri(Uri uri){
+        // seems only for oreo
+        File file = new File(uri.getPath());//create path from uri
+        final String[] split = file.getPath().split(":");//split the path.
+        //String filePath = split[1];//assign it to a string(your choice).
+        String sdCardRoot= StoragePathUtil.getPath(this,true);
+        String path=sdCardRoot + "/" + split[1];
+        return path;
     }
 
     //play功能函数

@@ -11,5 +11,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_x="31dp"
-        android:text="作者：中华颜值帝\n版本：0.6\n释放日期：17/04/27" />
+        android:text="作者：中华颜值帝\n版本：0.6.1\n释放日期：19/08/25" />
 </android.support.constraint.ConstraintLayout>
